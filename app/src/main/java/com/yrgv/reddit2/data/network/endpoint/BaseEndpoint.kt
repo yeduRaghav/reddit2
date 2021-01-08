@@ -47,9 +47,9 @@ abstract class BaseEndpoint<R>(val localiseResponse: Either<EndpointError, R>) {
     private suspend fun attemptNetworkCall(): Either<EndpointError, R> {
         return withContext(Dispatchers.IO) {
             try {
-                currentCall.execute().getLocalisedResponse()
+                currentCall.execute().localise()
             } catch (throwable: Throwable) {
-                throwable.getLocalisedError()
+                throwable.toLocalError()
             }
         }
     }
@@ -64,18 +64,10 @@ abstract class BaseEndpoint<R>(val localiseResponse: Either<EndpointError, R>) {
         }
     }
 
-    private fun Response<R>.getLocalisedResponse(): Either<EndpointError, R> {
+    private fun Response<R>.localise(): Either<EndpointError, R> {
         return body()?.let {
             value(it)
-        } ?: TODO() //error(EndpointError)
-    }
-
-    /**
-     * Handle exceptions from Network call
-     * */
-    private fun Throwable.getLocalisedError(): Either<EndpointError, Nothing> {
-        TODO()//return error(EndpointError.getLocalizedErrorResponse(this))
+        } ?: error(getEndpointError(code(),message()))
     }
 
 }
-

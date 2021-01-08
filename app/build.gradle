@@ -66,7 +66,10 @@ dependencies {
     implementation "joda-time:joda-time:$jodaVersion"
 
     //test
-    testImplementation 'junit:junit:4.13.1'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    testImplementation "junit:junit:$jUnitVersion"
+    androidTestImplementation "androidx.test.ext:junit:jUnitExtensionVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpMockWebServer"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+
 }

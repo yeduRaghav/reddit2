@@ -1,11 +1,14 @@
 package com.yrgv.reddit2.data.network.endpoint
 
+import com.yrgv.reddit2.utils.Either
+
 /**
  * Defines localized error responses and their associated data.
  */
 sealed class EndpointError(open val message: String?) {
 
-    data class UnhandledError(val originalException: Throwable?, override val message: String?) : EndpointError(message)
+    data class UnhandledError(val responseCode:Int?, val originalThrowable: Throwable?, override val message: String?) :
+        EndpointError(message)
 
     sealed class ClientError(override val message: String?) : EndpointError(message) {
         data class BadRequest(override val message: String?) : ClientError(message)
@@ -20,5 +23,40 @@ sealed class EndpointError(open val message: String?) {
         data class InternalServerError(override val message: String?) : ServerError(message)
         data class ServiceUnavailable(override val message: String?) : ServerError(message)
     }
-
 }
+
+object StatusCode {
+    const val BAD_REQUEST = 400
+    const val UNAUTHORISED = 401
+    const val FORBIDDEN = 403
+    const val NOT_FOUND = 404
+    const val TIMEOUT = 408
+    const val I_AM_A_TEAPOT = 418
+    const val INTERNAL_SERVER_ERROR = 500
+    const val SERVICE_UNAVAILABLE = 503
+}
+
+/**
+ * Return appropriate EndpointError based on Http response code
+ * */
+
+fun getEndpointError(code:Int, message:String?) : EndpointError {
+    return when (code) {
+        StatusCode.BAD_REQUEST -> EndpointError.ClientError.BadRequest(message)
+        StatusCode.UNAUTHORISED -> EndpointError.ClientError.Unauthorised(message)
+        StatusCode.FORBIDDEN -> EndpointError.ClientError.Forbidden(message)
+        StatusCode.NOT_FOUND -> EndpointError.ClientError.NotFound(message)
+        StatusCode.TIMEOUT -> EndpointError.ClientError.Timeout(message)
+        StatusCode.I_AM_A_TEAPOT -> EndpointError.ClientError.IAmATeapot(message)
+        StatusCode.INTERNAL_SERVER_ERROR -> EndpointError.ServerError.InternalServerError(message)
+        StatusCode.SERVICE_UNAVAILABLE -> EndpointError.ServerError.ServiceUnavailable(message)
+        else -> EndpointError.UnhandledError(code, null, message)
+    }
+}
+
+
+/**
+ * Return appropriate EndpointError based on Throwable
+ * */
+fun Throwable.toLocalError(responseCode:Int?=null): Either<EndpointError, Nothing> =
+    error(EndpointError.UnhandledError(responseCode, this, localizedMessage))
