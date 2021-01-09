@@ -20,7 +20,8 @@ interface RedditApi {
         private const val BASE_URL = "https://www.reddit.com/r/"
         private const val RESPONSE_TYPE_JSON = ".json"
 
-        private const val PATH_SUBREDDIT = "subReddit"
+        private const val PATH_VAR_SUBREDDIT = "subReddit"
+        private const val PATH_SUBREDDIT = "{$PATH_VAR_SUBREDDIT}$RESPONSE_TYPE_JSON"
 
         fun build(): RedditApi {
             val okhttpClient = OkHttpClient.Builder()
@@ -44,10 +45,9 @@ interface RedditApi {
     }
 
 
-
-    @GET("{$PATH_SUBREDDIT}$RESPONSE_TYPE_JSON")
+    @GET(PATH_SUBREDDIT)
     fun getPosts(
-        @Path(PATH_SUBREDDIT) subReddit: String
+        @Path(PATH_VAR_SUBREDDIT) subReddit: String
     ): Call<PostsResponse>
 
 }

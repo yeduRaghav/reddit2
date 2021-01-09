@@ -12,7 +12,7 @@ import retrofit2.Response
  * Parent class for all endpoints.
  * Handles network response and exceptions and return localized response for the app
  */
-abstract class BaseEndpoint<R>(val localiseResponse: Either<EndpointError, R>) {
+abstract class BaseEndpoint<R> {
 
     /**
      * The current call instance
@@ -27,24 +27,18 @@ abstract class BaseEndpoint<R>(val localiseResponse: Either<EndpointError, R>) {
 
     /**
      * Invoke to perform the network call.
-     *
-     * @param cancelOnGoingCall `true`, if there is a call in-progress, attempts to cancel
-     * it before the performing the new call. `false`, will not attempt to cancel
-     * the previous call in-progress and will perform the new call.
-     *
      * @return If network call fails, returns appropriate [EndpointError].
      * If successful, returns Response body <R>
      * */
-    suspend fun execute(cancelOnGoingCall: Boolean = true): Either<EndpointError, R> {
-        if (cancelOnGoingCall) {
-            attemptToCancelCurrentCall()
-        }
+    suspend fun execute(): Either<EndpointError, R> {
+        cancelCurrentCall()
         currentCall = getCall()
-        return attemptNetworkCall()
+        return performNetworkCall()
     }
 
 
-    private suspend fun attemptNetworkCall(): Either<EndpointError, R> {
+    //ignore warning https://discuss.kotlinlang.org/t/warning-inappropriate-blocking-method-call-with-coroutines-how-to-fix/16903
+    private suspend fun performNetworkCall(): Either<EndpointError, R> {
         return withContext(Dispatchers.IO) {
             try {
                 currentCall.execute().localise()
@@ -54,7 +48,7 @@ abstract class BaseEndpoint<R>(val localiseResponse: Either<EndpointError, R>) {
         }
     }
 
-    private fun attemptToCancelCurrentCall() {
+    private fun cancelCurrentCall() {
         if (::currentCall.isInitialized) {
             try {
                 currentCall.cancel()

@@ -7,8 +7,11 @@ import com.yrgv.reddit2.utils.Either
  */
 sealed class EndpointError(open val message: String?) {
 
-    data class UnhandledError(val responseCode:Int?, val originalThrowable: Throwable?, override val message: String?) :
-        EndpointError(message)
+    data class UnhandledError(
+        val responseCode: Int? = null,
+        val originalThrowable: Throwable? = null,
+        override val message: String?
+    ) : EndpointError(message)
 
     sealed class ClientError(override val message: String?) : EndpointError(message) {
         data class BadRequest(override val message: String?) : ClientError(message)
@@ -58,5 +61,6 @@ fun getEndpointError(code:Int, message:String?) : EndpointError {
 /**
  * Return appropriate EndpointError based on Throwable
  * */
-fun Throwable.toLocalError(responseCode:Int?=null): Either<EndpointError, Nothing> =
-    error(EndpointError.UnhandledError(responseCode, this, localizedMessage))
+fun Throwable.toLocalError(responseCode: Int? = null): Either<EndpointError, Nothing> {
+    return Either.error(EndpointError.UnhandledError(responseCode, this, message))
+}
