@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.yrgv.reddit2.R
 import com.yrgv.reddit2.utils.UiState
+import com.yrgv.reddit2.utils.setThrottledClickListener
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
 class MainScreenActivity : AppCompatActivity() {
@@ -26,7 +27,7 @@ class MainScreenActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
-        textView.setOnClickListener { viewModel.loadSubReddit("PS4") }
+        textView.setThrottledClickListener { viewModel.loadSubReddit("PS4") }
     }
 
     private fun setupViewModelObservers() {
