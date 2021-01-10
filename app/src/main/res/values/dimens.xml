@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="margin_8">8dp</dimen>
+    <dimen name="margin_16">16dp</dimen>
+    <dimen name="margin_32">32dp</dimen>
+
+    <dimen name="user_image_max_dimension">124dp</dimen>
+    <dimen name="post_card_corner_radius">8dp</dimen>
+    <dimen name="font_size_default">16sp</dimen>
+
+    <dimen name="progress_bar_length">62dp</dimen>
+</resources>

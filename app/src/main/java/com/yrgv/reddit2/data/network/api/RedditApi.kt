@@ -23,7 +23,16 @@ interface RedditApi {
         private const val PATH_VAR_SUBREDDIT = "subReddit"
         private const val PATH_SUBREDDIT = "{$PATH_VAR_SUBREDDIT}$RESPONSE_TYPE_JSON"
 
-        fun build(): RedditApi {
+        private lateinit var apiInstance: RedditApi
+
+        fun getInstance(): RedditApi {
+            if (!::apiInstance.isInitialized) {
+                apiInstance = build()
+            }
+            return apiInstance
+        }
+
+        private fun build(): RedditApi {
             val okhttpClient = OkHttpClient.Builder()
                 .addInterceptor(getLoggingInterceptor())
                 .build()
