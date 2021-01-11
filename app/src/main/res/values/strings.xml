@@ -2,4 +2,7 @@
     <string name="app_name">Reddit2</string>
     <string name="post_thumbnail_content_description">Post Thumbnail</string>
     <string name="user_prefix">u/</string>
+
+    <string name="error_view_message">Oops! Something went wrong!</string>
+    <string name="error_view_button">Try again</string>
 </resources>

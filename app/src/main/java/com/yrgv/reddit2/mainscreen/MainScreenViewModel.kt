@@ -9,7 +9,9 @@ import com.yrgv.reddit2.data.network.api.model.response.PostsResponse
 import com.yrgv.reddit2.utils.model.toUiModels
 import com.yrgv.reddit2.utils.resourceprovider.ResourceProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainScreenViewModel(
     private val resourceProvider: ResourceProvider,
@@ -18,25 +20,39 @@ class MainScreenViewModel(
 
     private val screenState = MutableLiveData<UiState>()
     private val posts = MutableLiveData<List<PostUiModel>>()
+    private lateinit var currentSubReddit: String
+    private var currentSearchJob: Job? = null
 
     fun getScreenState(): LiveData<UiState> = screenState
     fun getPosts(): LiveData<List<PostUiModel>> = posts
 
-    fun loadSubReddit(subReddit: String) {
+    fun search(subReddit: String) {
+        currentSubReddit = subReddit
+        performSearch()
+    }
+
+    fun retry() {
+        performSearch()
+    }
+
+    private fun performSearch() {
         screenState.postValue(UiState.LOADING)
-        viewModelScope.launch(Dispatchers.IO) {
-            fetchFeedFromApi(subReddit)
+        currentSearchJob?.cancel()
+        currentSearchJob = viewModelScope.launch {
+            fetchFeedFromApi(currentSubReddit)
         }
     }
 
     private suspend fun fetchFeedFromApi(subReddit: String) {
-        val response = feedEndpoint.apply { setData(subReddit) }.execute()
-        response.getValueOrNull()?.let { value ->
-            handlePosts(value.data.children)
-        } ?: screenState.postValue(UiState.ERROR)
+        withContext(Dispatchers.IO) {
+            val response = feedEndpoint.apply { setData(subReddit) }.execute()
+            response.getValueOrNull()?.let { value ->
+                handleFetchedPosts(value.data.children)
+            } ?: screenState.postValue(UiState.ERROR)
+        }
     }
 
-    private suspend fun handlePosts(posts: List<PostsResponse.Post>) {
+    private suspend fun handleFetchedPosts(posts: List<PostsResponse.Post>) {
         screenState.postValue(UiState.LOADED)
         this.posts.postValue(posts.toUiModels { resId ->
             resourceProvider.getString(resId)
