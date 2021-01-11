@@ -11,12 +11,14 @@ import retrofit2.Call
 class FeedEndpoint(private val redditApi: RedditApi) : BaseEndpoint<PostsResponse>() {
 
     private lateinit var subreddit: String
+    private var after: String? = null
 
-    fun setData(subreddit: String) {
+    fun setData(subreddit: String, after: String? = null) {
         this.subreddit = subreddit
+        this.after = after
     }
 
     override fun getCall(): Call<PostsResponse> {
-        return redditApi.getPosts(subreddit)
+        return redditApi.getPosts(subreddit, after)
     }
 }

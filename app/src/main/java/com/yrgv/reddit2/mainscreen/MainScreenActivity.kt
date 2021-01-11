@@ -30,7 +30,7 @@ class MainScreenActivity : AppCompatActivity() {
 
     private val listAdapter = PostsListAdapter { post ->
         Toast.makeText(this, post.author, Toast.LENGTH_LONG).show()
-        //todo:
+        viewModel.onPageBottomReached() //todo: remove me
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -9,6 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 /**
  * Retrofit Api definition.
@@ -21,6 +22,7 @@ interface RedditApi {
         private const val RESPONSE_TYPE_JSON = ".json"
 
         private const val PATH_VAR_SUBREDDIT = "subReddit"
+        private const val QUERY_AFTER = "after"
         private const val PATH_SUBREDDIT = "{$PATH_VAR_SUBREDDIT}$RESPONSE_TYPE_JSON"
 
         private lateinit var apiInstance: RedditApi
@@ -56,7 +58,8 @@ interface RedditApi {
 
     @GET(PATH_SUBREDDIT)
     fun getPosts(
-        @Path(PATH_VAR_SUBREDDIT) subReddit: String
+        @Path(PATH_VAR_SUBREDDIT) subReddit: String,
+        @Query(QUERY_AFTER) after: String?,
     ): Call<PostsResponse>
 
 }
