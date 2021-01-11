@@ -1,6 +1,7 @@
 package com.yrgv.reddit2.data.network.endpoint
 
 import com.yrgv.reddit2.utils.Either
+import java.net.UnknownHostException
 
 /**
  * Defines localized error responses and their associated data.
@@ -26,6 +27,9 @@ sealed class EndpointError(open val message: String?) {
         data class InternalServerError(override val message: String?) : ServerError(message)
         data class ServiceUnavailable(override val message: String?) : ServerError(message)
     }
+
+    data class Unreachable(override val message: String?) : EndpointError(message)
+
 }
 
 object StatusCode {
@@ -61,6 +65,11 @@ fun getEndpointError(code:Int, message:String?) : EndpointError {
 /**
  * Return appropriate EndpointError based on Throwable
  * */
+//TODO: ADD TESTS FOR ME
 fun Throwable.toLocalError(responseCode: Int? = null): Either<EndpointError, Nothing> {
-    return Either.error(EndpointError.UnhandledError(responseCode, this, message))
+    val endpointError = when (this) {
+        is UnknownHostException -> EndpointError.Unreachable(message)
+        else -> EndpointError.UnhandledError(responseCode, this, message)
+    }
+    return Either.error(endpointError)
 }

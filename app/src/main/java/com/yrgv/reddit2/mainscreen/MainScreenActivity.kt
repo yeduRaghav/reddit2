@@ -11,6 +11,7 @@ import com.yrgv.reddit2.data.network.api.RedditApi
 import com.yrgv.reddit2.utils.ErrorView
 import com.yrgv.reddit2.utils.hide
 import com.yrgv.reddit2.utils.resourceprovider.DefaultResourceProvider
+import com.yrgv.reddit2.utils.setOnBottomReachedListener
 import com.yrgv.reddit2.utils.show
 
 @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
@@ -44,9 +45,18 @@ class MainScreenActivity : AppCompatActivity() {
     private fun setupViews() {
         errorView = findViewById(R.id.main_screen_error_view)
         errorView.setButtonClickListener { viewModel.retry() }
-        recyclerview = findViewById(R.id.main_screen_recycler_view)
-        recyclerview.adapter = listAdapter
         loadingView = findViewById(R.id.main_screen_loading_view)
+        setupRecyclerView()
+    }
+
+    private fun setupRecyclerView() {
+        recyclerview = findViewById(R.id.main_screen_recycler_view)
+        recyclerview.apply {
+            adapter = listAdapter
+            setOnBottomReachedListener {
+                viewModel.onPageBottomReached()
+            }
+        }
     }
 
     private fun setupViewModelObservers() {
@@ -68,9 +78,6 @@ class MainScreenActivity : AppCompatActivity() {
 
     /**
      * todo:
-     * commit 3
-     * build pagination
-     *
      * commit 4
      * build detail activity
      * build detail view model

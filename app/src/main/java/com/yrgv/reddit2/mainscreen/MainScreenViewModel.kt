@@ -91,6 +91,7 @@ class MainScreenViewModel(
 
     private fun handleResponseFailure(error: EndpointError) {
         when (error) {
+            is EndpointError.Unreachable,
             is EndpointError.UnhandledError,
             is EndpointError.ClientError.BadRequest,
             is EndpointError.ClientError.Unauthorised,
@@ -100,7 +101,9 @@ class MainScreenViewModel(
             is EndpointError.ClientError.IAmATeapot,
             is EndpointError.ServerError.InternalServerError,
             is EndpointError.ServerError.ServiceUnavailable -> {
-                screenState.postValue(UiState.ERROR)
+                if (pageAfter == null) {
+                    screenState.postValue(UiState.ERROR)
+                }
             }
         }
     }

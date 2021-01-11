@@ -1,6 +1,7 @@
 package com.yrgv.reddit2.utils
 
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 
 /**
@@ -25,4 +26,17 @@ fun View.setThrottledClickListener(delayInMillis: Long = 500L, runWhenClicked: S
         this.postDelayed({ this.isClickable = true }, delayInMillis)
         runWhenClicked()
     }
+}
+
+
+fun RecyclerView.setOnBottomReachedListener(listener: SimpleCallback) {
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            val directionDown = 1
+            if (!recyclerView.canScrollVertically(directionDown)) {
+                listener()
+            }
+        }
+    })
 }
